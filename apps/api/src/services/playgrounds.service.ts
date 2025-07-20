@@ -125,6 +125,7 @@ export class PlaygroundsService {
     addElement(element: PlaygroundElement) {
         this.playgroundState.elements[element.id] = element
         this.scheduleDatabaseSave()
+        return element.id
     }
 
     deleteElement(id: string) {

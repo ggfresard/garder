@@ -9,5 +9,6 @@ export enum SocketEvents {
     GET_PLAYGROUND_STATE = 'getPlaygroundState',
     PLAYGROUND_STATE = 'playgroundState',
     TEMPLATE_STATE = 'templateState',
-    ELEMENT_STATE = 'elementState',
+    UPDATE_ELEMENTS_STATE = 'updateElementsState',
+    REMOVE_ELEMENTS_STATE = 'removeElementsState',
 }

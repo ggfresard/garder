@@ -106,6 +106,8 @@ interface PlaygroundElementStore {
     increasePriority: (id: string) => void
     decreasePriority: (id: string) => void
     setElements: (elements: Record<string, PlaygroundElement>) => void
+    upsertElements: (elements: Record<string, PlaygroundElement>) => void
+    removeElements: (ids: string[]) => void
 }
 
 export const usePlaygroundElementStore = create<PlaygroundElementStore>(
@@ -189,6 +191,19 @@ export const usePlaygroundElementStore = create<PlaygroundElementStore>(
                     },
                 }
                 websocketService.updateElement(newElements[id])
+                return { elements: newElements }
+            })
+        },
+        upsertElements: (elements) => {
+            set((state) => {
+                const newElements = { ...state.elements, ...elements }
+                return { elements: newElements }
+            })
+        },
+        removeElements: (ids) => {
+            set((state) => {
+                const newElements = { ...state.elements }
+                ids.forEach((id) => delete newElements[id])
                 return { elements: newElements }
             })
         },

@@ -14,6 +14,7 @@ class WebSocketService {
     private onElementUpdateCallbacks: ((
         state: Record<string, PlaygroundElement>,
     ) => void)[] = []
+    private onRemoveElementUpdateCallbacks: ((state: string[]) => void)[] = []
     private onTemplateUpdateCallbacks: ((
         state: Record<string, CardTemplate>,
     ) => void)[] = []
@@ -73,10 +74,18 @@ class WebSocketService {
         )
 
         this.socket.on(
-            SocketEvents.ELEMENT_STATE,
+            SocketEvents.UPDATE_ELEMENTS_STATE,
             (state: Record<string, PlaygroundElement>) => {
                 console.log('Received element state:', state)
                 this.notifyElementUpdate(state)
+            },
+        )
+
+        this.socket.on(
+            SocketEvents.REMOVE_ELEMENTS_STATE,
+            (state: string[]) => {
+                console.log('Received element state:', state)
+                this.notifyRemoveElementUpdate(state)
             },
         )
 
@@ -182,6 +191,16 @@ class WebSocketService {
         }
     }
 
+    onRemoveElementUpdate(callback: (state: string[]) => void) {
+        this.onRemoveElementUpdateCallbacks.push(callback)
+        return () => {
+            const index = this.onRemoveElementUpdateCallbacks.indexOf(callback)
+            if (index > -1) {
+                this.onRemoveElementUpdateCallbacks.splice(index, 1)
+            }
+        }
+    }
+
     onTemplateUpdate(callback: (state: Record<string, CardTemplate>) => void) {
         this.onTemplateUpdateCallbacks.push(callback)
         return () => {
@@ -218,6 +237,12 @@ class WebSocketService {
     // Notification methods
     private notifyElementUpdate(state: Record<string, PlaygroundElement>) {
         this.onElementUpdateCallbacks.forEach((callback) => callback(state))
+    }
+
+    private notifyRemoveElementUpdate(state: string[]) {
+        this.onRemoveElementUpdateCallbacks.forEach((callback) =>
+            callback(state),
+        )
     }
 
     private notifyTemplateUpdate(state: Record<string, CardTemplate>) {

@@ -1,6 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
 import { websocketService } from '@/lib/services/websocket.service'
-import { PlaygroundState } from '@garder/shared'
 import {
     useCardTemplateStore,
     usePlaygroundElementStore,
@@ -8,7 +7,8 @@ import {
 
 export const useWebSocket = (serverUrl?: string) => {
     const [isConnected, setIsConnected] = useState(false)
-    const { setElements } = usePlaygroundElementStore()
+    const { upsertElements, removeElements, setElements } =
+        usePlaygroundElementStore()
     const { setTemplates } = useCardTemplateStore()
     const [error, setError] = useState<string | null>(null)
 
@@ -47,8 +47,14 @@ export const useWebSocket = (serverUrl?: string) => {
         })
 
         const unsubscribeElement = websocketService.onElementUpdate((state) => {
-            setElements(state)
+            upsertElements(state)
         })
+
+        const unsubscribeRemoveElement = websocketService.onRemoveElementUpdate(
+            (state) => {
+                removeElements(state)
+            },
+        )
 
         const unsubscribeTemplate = websocketService.onTemplateUpdate(
             (state) => {

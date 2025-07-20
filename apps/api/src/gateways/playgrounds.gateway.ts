@@ -46,27 +46,24 @@ export class PlaygroundsGateway
     handleUpdateElement(@MessageBody() update: PlaygroundElement) {
         this.playgroundsService.updateElement(update.id, update)
         this.server.emit(
-            SocketEvents.ELEMENT_STATE,
-            this.playgroundsService.getPlaygroundState().elements,
+            SocketEvents.UPDATE_ELEMENTS_STATE,
+            this.playgroundsService.getPlaygroundState().elements[update.id],
         )
     }
 
     @SubscribeMessage(SocketEvents.ADD_ELEMENT)
     handleAddElement(@MessageBody() add: PlaygroundElement) {
-        this.playgroundsService.addElement(add)
+        const id = this.playgroundsService.addElement(add)
         this.server.emit(
-            SocketEvents.ELEMENT_STATE,
-            this.playgroundsService.getPlaygroundState().elements,
+            SocketEvents.UPDATE_ELEMENTS_STATE,
+            this.playgroundsService.getPlaygroundState().elements[id],
         )
     }
 
     @SubscribeMessage(SocketEvents.DELETE_ELEMENT)
     handleDeleteElement(@MessageBody() del: PlaygroundElement) {
         this.playgroundsService.deleteElement(del.id)
-        this.server.emit(
-            SocketEvents.ELEMENT_STATE,
-            this.playgroundsService.getPlaygroundState().elements,
-        )
+        this.server.emit(SocketEvents.REMOVE_ELEMENTS_STATE, [del.id])
     }
 
     @SubscribeMessage(SocketEvents.UPDATE_ELEMENTS)
@@ -75,7 +72,7 @@ export class PlaygroundsGateway
     ) {
         this.playgroundsService.updateElements(update)
         this.server.emit(
-            SocketEvents.ELEMENT_STATE,
+            SocketEvents.UPDATE_ELEMENTS_STATE,
             this.playgroundsService.getPlaygroundState().elements,
         )
     }
