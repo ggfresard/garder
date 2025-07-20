@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common'
-import { MongooseModule } from '@nestjs/mongoose'
+import { MongooseModule, MongooseModuleOptions } from '@nestjs/mongoose'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { Playground, PlaygroundSchema } from '../schemas/playground.schema'
 import { EnvironmentVariables } from 'src/config/configuration'
