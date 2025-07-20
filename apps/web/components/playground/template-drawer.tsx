@@ -58,7 +58,6 @@ const TemplateDrawer = ({ children }: TemplateDrawerProps) => {
                 },
             ],
         }
-        addTemplate(newTemplate)
         setEditingTemplate(newTemplate)
         setIsCreating(true)
     }

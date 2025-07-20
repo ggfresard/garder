@@ -46,10 +46,8 @@ async function bootstrap() {
     const port = configService.get(EnvironmentVariables.PORT) as number
     await app.listen(port)
 
-    console.log(`Application is running on: http://localhost:${port}`)
-    console.log(
-        `Swagger documentation is available at: http://localhost:${port}/api`,
-    )
+    console.log(`Application is running on: {port}`)
+    console.log(`Swagger documentation is available at: ${port}/api`)
 }
 
 bootstrap()
