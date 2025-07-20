@@ -22,7 +22,7 @@ import {
     ContextMenuSubTrigger,
     ContextMenuSubContent,
 } from '@/components/ui/context-menu'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Draggable from './draggable'
 import Element from './elements'
 import { useIsTouchDevice, useMultiTouch } from '@/hooks/use-touch'
@@ -62,7 +62,7 @@ const Playground = () => {
     const bind = useGesture(
         {
             // Panning gesture (works for both mobile and desktop)
-            onDrag: ({ delta: [dx, dy], touches, buttons, event }) => {
+            onDrag: ({ delta: [dx, dy], buttons }) => {
                 // On mobile, allow single finger drag for panning (but not during multi-touch)
                 // On desktop, allow mouse drag (buttons > 0 indicates mouse drag)
                 if (isMobile) {

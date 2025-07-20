@@ -9,7 +9,7 @@ interface PlaygroundStore {
     setOffset: (offset: { x: number; y: number }) => void
 }
 
-export const usePlaygroundStore = create<PlaygroundStore>((set, get) => ({
+export const usePlaygroundStore = create<PlaygroundStore>((set) => ({
     zoom: CONSTANTS.INITIAL_ZOOM,
     offset: { x: 0, y: 0 },
     setZoom: (z) => {

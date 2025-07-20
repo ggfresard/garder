@@ -66,7 +66,9 @@ const TemplateCard: React.FC<TemplateCardProps> = ({
                                     .slice(0, 3)
                                     .map((value, index) => {
                                         const ValueIconComponent = value.icon
-                                            ? LucideIconMap[value.icon]
+                                            ? LucideIconMap[
+                                                  value.icon as keyof typeof LucideIconMap
+                                              ]
                                             : null
                                         return (
                                             <div

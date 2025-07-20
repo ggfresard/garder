@@ -1,10 +1,8 @@
 import {
     CardElement as CardElementType,
     CardValue,
-    ValueModifier,
     ElementType,
     usePlaygroundElementStore,
-    usePlaygroundStore,
     useCardTemplateStore,
 } from '@/lib/stores/playground.store'
 
@@ -41,13 +39,8 @@ interface CardElementProps {
 }
 
 const CardElement = ({ element }: CardElementProps) => {
-    const {
-        deleteElement,
-        addElement,
-        updateElement,
-        increasePriority,
-        decreasePriority,
-    } = usePlaygroundElementStore()
+    const { deleteElement, updateElement, increasePriority, decreasePriority } =
+        usePlaygroundElementStore()
     const cardsOnBottom = usePlaygroundElementStore(
         useShallow((s) =>
             Object.values(s.elements).filter(
@@ -77,14 +70,6 @@ const CardElement = ({ element }: CardElementProps) => {
 
     const handleDelete = () => {
         deleteElement(element.id)
-    }
-
-    const handleDuplicate = () => {
-        const newCard: CardElementType = {
-            ...element,
-            id: `card-${Date.now()}`,
-        }
-        addElement(newCard)
     }
 
     const handleIncreasePriority = () => {
@@ -194,8 +179,7 @@ const CardElement = ({ element }: CardElementProps) => {
                                                             const IconComponent =
                                                                 value.icon
                                                                     ? LucideIconMap[
-                                                                          value
-                                                                              .icon
+                                                                          value.icon as keyof typeof LucideIconMap
                                                                       ]
                                                                     : null
 
@@ -212,9 +196,6 @@ const CardElement = ({ element }: CardElementProps) => {
                                                                     : value.value
                                                             const isPositive =
                                                                 finalValue >=
-                                                                value.value
-                                                            const isNegative =
-                                                                finalValue <
                                                                 value.value
                                                             const hasModifier =
                                                                 modifier &&
