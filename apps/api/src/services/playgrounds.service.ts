@@ -59,65 +59,76 @@ export class PlaygroundsService {
         return newPlayground
     }
 
+    /**
+     * Save playground state to database asynchronously
+     */
+    private async saveToDatabase() {
+        try {
+            await this.playgroundModel.updateOne(
+                {},
+                {
+                    $set: {
+                        elements: this.playgroundState.elements,
+                        templates: this.playgroundState.templates,
+                    },
+                },
+                { upsert: true },
+            )
+        } catch (error) {
+            this.logger.error(
+                'Failed to save playground state to database',
+                error,
+            )
+        }
+    }
+
+    /**
+     * Schedule database save operation to run in background
+     */
+    private scheduleDatabaseSave() {
+        setImmediate(() => {
+            this.saveToDatabase()
+        })
+    }
+
     getPlaygroundState() {
         return this.playgroundState
     }
 
     updateElement(id: string, element: PlaygroundElement) {
         this.playgroundState.elements[id] = element
-        this.playgroundModel.updateOne(
-            {},
-            { $set: { elements: this.playgroundState.elements } },
-        )
+        this.scheduleDatabaseSave()
     }
 
     updateElements(elements: Record<string, PlaygroundElement>) {
         Object.values(elements).forEach((element) => {
             this.playgroundState.elements[element.id] = element
         })
-        this.playgroundModel.updateOne(
-            {},
-            { $set: { elements: this.playgroundState.elements } },
-        )
+        this.scheduleDatabaseSave()
     }
 
     updateTemplate(id: string, template: CardTemplate) {
         this.playgroundState.templates[id] = template
-        this.playgroundModel.updateOne(
-            {},
-            { $set: { templates: this.playgroundState.templates } },
-        )
+        this.scheduleDatabaseSave()
     }
 
     addTemplate(template: CardTemplate) {
         this.playgroundState.templates[template.id] = template
-        this.playgroundModel.updateOne(
-            {},
-            { $set: { templates: this.playgroundState.templates } },
-        )
+        this.scheduleDatabaseSave()
     }
 
     deleteTemplate(id: string) {
         delete this.playgroundState.templates[id]
-        this.playgroundModel.updateOne(
-            {},
-            { $set: { templates: this.playgroundState.templates } },
-        )
+        this.scheduleDatabaseSave()
     }
 
     addElement(element: PlaygroundElement) {
         this.playgroundState.elements[element.id] = element
-        this.playgroundModel.updateOne(
-            {},
-            { $set: { elements: this.playgroundState.elements } },
-        )
+        this.scheduleDatabaseSave()
     }
 
     deleteElement(id: string) {
         delete this.playgroundState.elements[id]
-        this.playgroundModel.updateOne(
-            {},
-            { $set: { elements: this.playgroundState.elements } },
-        )
+        this.scheduleDatabaseSave()
     }
 }
