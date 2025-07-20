@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+        />
+        <title>Playground System Test Client</title>
+        <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+            .container {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+            }
+            .panel {
+                border: 1px solid #ccc;
+                padding: 15px;
+                border-radius: 5px;
+            }
+            .status {
+                background-color: #f0f0f0;
+                padding: 10px;
+                border-radius: 5px;
+                margin-bottom: 15px;
+            }
+            .log {
+                background-color: #f9f9f9;
+                border: 1px solid #ddd;
+                padding: 10px;
+                height: 300px;
+                overflow-y: auto;
+                font-family: monospace;
+                font-size: 12px;
+            }
+            button {
+                margin: 5px;
+                padding: 8px 12px;
+                border: none;
+                border-radius: 3px;
+                background-color: #007bff;
+                color: white;
+                cursor: pointer;
+            }
+            button:hover {
+                background-color: #0056b3;
+            }
+            button.danger {
+                background-color: #dc3545;
+            }
+            button.danger:hover {
+                background-color: #c82333;
+            }
+            input,
+            textarea {
+                width: 100%;
+                padding: 5px;
+                margin: 5px 0;
+                border: 1px solid #ccc;
+                border-radius: 3px;
+            }
+            .connected {
+                color: green;
+            }
+            .disconnected {
+                color: red;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Playground System Test Client</h1>
+
+        <div class="status">
+            <div>
+                Connection Status:
+                <span
+                    id="connectionStatus"
+                    class="disconnected"
+                    >Disconnected</span
+                >
+            </div>
+            <div>Client ID: <span id="clientId">-</span></div>
+            <div>Connected Clients: <span id="connectedClients">0</span></div>
+        </div>
+
+        <div class="container">
+            <div class="panel">
+                <h3>Actions</h3>
+                <button onclick="getPlaygroundState()">Get State</button>
+                <button onclick="resetPlayground()">Reset Playground</button>
+                <button onclick="getConnectedClients()">
+                    Get Connected Clients
+                </button>
+                <button onclick="syncFromDatabase()">Sync from Database</button>
+
+                <h4>Add Text Element</h4>
+                <input
+                    type="text"
+                    id="textId"
+                    placeholder="Element ID"
+                    value="text-1"
+                />
+                <input
+                    type="number"
+                    id="textX"
+                    placeholder="X position"
+                    value="100"
+                />
+                <input
+                    type="number"
+                    id="textY"
+                    placeholder="Y position"
+                    value="100"
+                />
+                <input
+                    type="text"
+                    id="textContent"
+                    placeholder="Text content"
+                    value="Hello World"
+                />
+                <button onclick="addTextElement()">Add Text Element</button>
+
+                <h4>Add Card Element</h4>
+                <input
+                    type="text"
+                    id="cardId"
+                    placeholder="Element ID"
+                    value="card-1"
+                />
+                <input
+                    type="number"
+                    id="cardX"
+                    placeholder="X position"
+                    value="200"
+                />
+                <input
+                    type="number"
+                    id="cardY"
+                    placeholder="Y position"
+                    value="200"
+                />
+                <input
+                    type="text"
+                    id="cardTemplate"
+                    placeholder="Template ID"
+                    value="template-1"
+                />
+                <button onclick="addCardElement()">Add Card Element</button>
+
+                <h4>Add Template</h4>
+                <input
+                    type="text"
+                    id="templateId"
+                    placeholder="Template ID"
+                    value="template-1"
+                />
+                <input
+                    type="text"
+                    id="templateTitle"
+                    placeholder="Title"
+                    value="Sample Card"
+                />
+                <input
+                    type="text"
+                    id="templateDescription"
+                    placeholder="Description"
+                    value="A sample card"
+                />
+                <input
+                    type="text"
+                    id="templateColor"
+                    placeholder="Color"
+                    value="#ff0000"
+                />
+                <button onclick="addTemplate()">Add Template</button>
+            </div>
+
+            <div class="panel">
+                <h3>Current State</h3>
+                <textarea
+                    id="currentState"
+                    rows="10"
+                    readonly
+                ></textarea>
+
+                <h3>Event Log</h3>
+                <div
+                    id="eventLog"
+                    class="log"
+                ></div>
+            </div>
+        </div>
+
+        <script>
+            const socket = io('http://localhost:3001')
+            let currentState = { elements: {}, templates: {} }
+
+            // Connection events
+            socket.on('connect', () => {
+                updateConnectionStatus(true)
+                log('Connected to playground server')
+            })
+
+            socket.on('disconnect', () => {
+                updateConnectionStatus(false)
+                log('Disconnected from playground server')
+            })
+
+            // Playground state events
+            socket.on('playgroundState', (state) => {
+                currentState = state
+                updateCurrentState()
+                log('Received playground state')
+            })
+
+            socket.on('playgroundUpdated', (data) => {
+                currentState = data.updatedState
+                updateCurrentState()
+                log(`Playground updated by ${data.updatedBy}`)
+            })
+
+            socket.on('playgroundReplaced', (data) => {
+                currentState = data.newState
+                updateCurrentState()
+                log(`Playground replaced by ${data.replacedBy}`)
+            })
+
+            socket.on('playgroundReset', (data) => {
+                currentState = data.resetState
+                updateCurrentState()
+                log(`Playground reset by ${data.resetBy}`)
+            })
+
+            socket.on('playgroundSynced', (data) => {
+                currentState = data.syncedState
+                updateCurrentState()
+                log(`Playground synced by ${data.syncedBy}`)
+            })
+
+            // Client events
+            socket.on('clientConnected', (data) => {
+                document.getElementById('connectedClients').textContent =
+                    data.totalClients
+                log(`Client ${data.clientId} connected`)
+            })
+
+            socket.on('clientDisconnected', (data) => {
+                document.getElementById('connectedClients').textContent =
+                    data.totalClients
+                log(`Client ${data.clientId} disconnected`)
+            })
+
+            // Confirmation events
+            socket.on('playgroundUpdateConfirmed', (data) => {
+                log('Playground update confirmed')
+            })
+
+            socket.on('playgroundReplaceConfirmed', (data) => {
+                log('Playground replace confirmed')
+            })
+
+            socket.on('playgroundResetConfirmed', (data) => {
+                log('Playground reset confirmed')
+            })
+
+            // Error events
+            socket.on('playgroundUpdateError', (data) => {
+                log(`Error updating playground: ${data.error}`)
+            })
+
+            socket.on('playgroundReplaceError', (data) => {
+                log(`Error replacing playground: ${data.error}`)
+            })
+
+            socket.on('playgroundResetError', (data) => {
+                log(`Error resetting playground: ${data.error}`)
+            })
+
+            socket.on('syncError', (data) => {
+                log(`Sync error: ${data.error}`)
+            })
+
+            // Connected clients events
+            socket.on('connectedClients', (data) => {
+                document.getElementById('connectedClients').textContent =
+                    data.count
+                log(`Connected clients: ${data.clientIds.join(', ')}`)
+            })
+
+            // Functions
+            function updateConnectionStatus(connected) {
+                const status = document.getElementById('connectionStatus')
+                const clientId = document.getElementById('clientId')
+
+                if (connected) {
+                    status.textContent = 'Connected'
+                    status.className = 'connected'
+                    clientId.textContent = socket.id
+                } else {
+                    status.textContent = 'Disconnected'
+                    status.className = 'disconnected'
+                    clientId.textContent = '-'
+                }
+            }
+
+            function updateCurrentState() {
+                document.getElementById('currentState').value = JSON.stringify(
+                    currentState,
+                    null,
+                    2,
+                )
+            }
+
+            function log(message) {
+                const logElement = document.getElementById('eventLog')
+                const timestamp = new Date().toLocaleTimeString()
+                logElement.innerHTML += `[${timestamp}] ${message}\n`
+                logElement.scrollTop = logElement.scrollHeight
+            }
+
+            function getPlaygroundState() {
+                socket.emit('getPlaygroundState')
+                log('Requested playground state')
+            }
+
+            function resetPlayground() {
+                socket.emit('resetPlayground')
+                log('Requested playground reset')
+            }
+
+            function getConnectedClients() {
+                socket.emit('getConnectedClients')
+                log('Requested connected clients')
+            }
+
+            function syncFromDatabase() {
+                socket.emit('syncFromDatabase')
+                log('Requested sync from database')
+            }
+
+            function addTextElement() {
+                const id = document.getElementById('textId').value
+                const x = parseInt(document.getElementById('textX').value)
+                const y = parseInt(document.getElementById('textY').value)
+                const text = document.getElementById('textContent').value
+
+                const update = {
+                    elements: {
+                        ...currentState.elements,
+                        [id]: {
+                            id,
+                            x,
+                            y,
+                            type: 'text',
+                            renderingPriority: 1,
+                            text,
+                        },
+                    },
+                }
+
+                socket.emit('updatePlayground', update)
+                log(`Adding text element: ${id}`)
+            }
+
+            function addCardElement() {
+                const id = document.getElementById('cardId').value
+                const x = parseInt(document.getElementById('cardX').value)
+                const y = parseInt(document.getElementById('cardY').value)
+                const template = document.getElementById('cardTemplate').value
+
+                const update = {
+                    elements: {
+                        ...currentState.elements,
+                        [id]: {
+                            id,
+                            x,
+                            y,
+                            type: 'card',
+                            renderingPriority: 1,
+                            template,
+                            modifiers: [],
+                            isFaceUp: true,
+                        },
+                    },
+                }
+
+                socket.emit('updatePlayground', update)
+                log(`Adding card element: ${id}`)
+            }
+
+            function addTemplate() {
+                const id = document.getElementById('templateId').value
+                const title = document.getElementById('templateTitle').value
+                const description = document.getElementById(
+                    'templateDescription',
+                ).value
+                const color = document.getElementById('templateColor').value
+
+                const update = {
+                    templates: {
+                        ...currentState.templates,
+                        [id]: {
+                            id,
+                            title,
+                            description,
+                            color,
+                            values: [
+                                { label: 'Value 1', value: 10 },
+                                { label: 'Value 2', value: 20 },
+                            ],
+                        },
+                    },
+                }
+
+                socket.emit('updatePlayground', update)
+                log(`Adding template: ${id}`)
+            }
+
+            // Initialize
+            updateCurrentState()
+        </script>
+    </body>
+</html>
