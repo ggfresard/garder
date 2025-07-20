@@ -45,19 +45,20 @@ export class PlaygroundsGateway
     @SubscribeMessage(SocketEvents.UPDATE_ELEMENT)
     handleUpdateElement(@MessageBody() update: PlaygroundElement) {
         this.playgroundsService.updateElement(update.id, update)
-        this.server.emit(
-            SocketEvents.UPDATE_ELEMENTS_STATE,
-            this.playgroundsService.getPlaygroundState().elements[update.id],
-        )
+        this.server.emit(SocketEvents.UPDATE_ELEMENTS_STATE, {
+            [update.id]:
+                this.playgroundsService.getPlaygroundState().elements[
+                    update.id
+                ],
+        })
     }
 
     @SubscribeMessage(SocketEvents.ADD_ELEMENT)
     handleAddElement(@MessageBody() add: PlaygroundElement) {
         const id = this.playgroundsService.addElement(add)
-        this.server.emit(
-            SocketEvents.UPDATE_ELEMENTS_STATE,
-            this.playgroundsService.getPlaygroundState().elements[id],
-        )
+        this.server.emit(SocketEvents.UPDATE_ELEMENTS_STATE, {
+            [id]: this.playgroundsService.getPlaygroundState().elements[id],
+        })
     }
 
     @SubscribeMessage(SocketEvents.DELETE_ELEMENT)
@@ -71,10 +72,7 @@ export class PlaygroundsGateway
         @MessageBody() update: Record<string, PlaygroundElement>,
     ) {
         this.playgroundsService.updateElements(update)
-        this.server.emit(
-            SocketEvents.UPDATE_ELEMENTS_STATE,
-            this.playgroundsService.getPlaygroundState().elements,
-        )
+        this.server.emit(SocketEvents.UPDATE_ELEMENTS_STATE, update)
     }
 
     @SubscribeMessage(SocketEvents.UPDATE_TEMPLATE)
