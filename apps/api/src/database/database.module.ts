@@ -10,7 +10,7 @@ import { EnvironmentVariables } from 'src/config/configuration'
             imports: [ConfigModule],
             useFactory: (configService: ConfigService) => ({
                 uri: configService.get<string>(
-                    EnvironmentVariables.MONGODB_URI,
+                    EnvironmentVariables.MONGODB_URL,
                 ),
             }),
             inject: [ConfigService],

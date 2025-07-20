@@ -20,7 +20,10 @@ class WebSocketService {
     private onConnectionChangeCallbacks: ((connected: boolean) => void)[] = []
     private onErrorCallbacks: ((error: string) => void)[] = []
 
-    connect(url: string = 'http://localhost:3001') {
+    connect(
+        url: string = process.env.NEXT_PUBLIC_API_URL ||
+            'http://localhost:3001',
+    ) {
         if (this.socket?.connected) {
             return
         }
