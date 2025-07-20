@@ -8,11 +8,16 @@ import { EnvironmentVariables } from 'src/config/configuration'
     imports: [
         MongooseModule.forRootAsync({
             imports: [ConfigModule],
-            useFactory: (configService: ConfigService) => ({
-                uri: configService.get<string>(
-                    EnvironmentVariables.MONGODB_URL,
-                ),
-            }),
+            useFactory: (configService: ConfigService) => {
+                console.log(
+                    configService.get<string>(EnvironmentVariables.MONGODB_URL),
+                )
+                return {
+                    uri: configService.get<string>(
+                        EnvironmentVariables.MONGODB_URL,
+                    ),
+                }
+            },
             inject: [ConfigService],
         }),
         MongooseModule.forFeature([
