@@ -1,10 +1,6 @@
 'use client'
 
 import {
-    CardElement,
-    ElementType,
-    TextElement,
-    CardTemplate,
     usePlaygroundElementStore,
     usePlaygroundStore,
 } from '@/lib/stores/playground.store'
@@ -31,6 +27,12 @@ import { useCardTemplateStore } from '@/lib/stores/playground.store'
 import { Button } from '@/components/ui/button'
 import { Layers } from 'lucide-react'
 import StackElement from './elements/stack'
+import {
+    CardElement,
+    CardTemplate,
+    ElementType,
+    TextElement,
+} from '@garder/shared'
 
 const Playground = () => {
     const { zoom, offset, setZoom, setOffset } = usePlaygroundStore()
@@ -255,19 +257,23 @@ const Playground = () => {
                 </ContextMenuContent>
             </ContextMenu>
             {/* Floating Action Button for Templates */}
+
             {Object.values(elements)
                 .sort((a, b) => {
                     return a.renderingPriority - b.renderingPriority
                 })
-                .map((element) => (
-                    <Draggable
-                        key={element.id}
-                        id={element.id}
-                        onDragCommit={false}
-                    >
-                        <Element element={element} />
-                    </Draggable>
-                ))}
+                .map((element) => {
+                    console.log(element.id)
+                    return (
+                        <Draggable
+                            key={element.id}
+                            id={element.id}
+                            onDragCommit={false}
+                        >
+                            <Element element={element} />
+                        </Draggable>
+                    )
+                })}
             {groups.map((group) => (
                 <Draggable
                     key={group[0]}

@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { CONSTANTS } from './constants.store'
 import { websocketService } from '../services/websocket.service'
+import { CardTemplate, PlaygroundElement } from '@garder/shared'
 
 interface PlaygroundStore {
     zoom: number
@@ -23,69 +24,6 @@ export const usePlaygroundStore = create<PlaygroundStore>((set) => ({
         set({ offset })
     },
 }))
-
-export enum ElementType {
-    CARD = 'card',
-    TEXT = 'text',
-}
-
-interface BaseElement {
-    id: string
-    x: number
-    y: number
-    type: ElementType
-    renderingPriority: number
-}
-
-export interface TextElement extends BaseElement {
-    type: ElementType.TEXT
-    text: string
-    fontSize?: number
-    fontWeight?:
-        | 'normal'
-        | 'bold'
-        | '100'
-        | '200'
-        | '300'
-        | '400'
-        | '500'
-        | '600'
-        | '700'
-        | '800'
-        | '900'
-    color?: string
-    backgroundColor?: string
-    fontFamily?: string
-}
-
-export interface CardTemplate {
-    title: string
-    description: string
-    values: CardValue[]
-    color: string
-    id: string
-    topRightLabel?: string
-}
-
-export interface CardValue {
-    label: string
-    value: number
-    icon?: string
-}
-
-export interface ValueModifier {
-    label: string
-    value: number
-}
-
-export interface CardElement extends BaseElement {
-    type: ElementType.CARD
-    template: string
-    modifiers: ValueModifier[]
-    isFaceUp: boolean
-}
-
-export type PlaygroundElement = TextElement | CardElement
 
 interface PlaygroundElementStore {
     elements: Record<string, PlaygroundElement>

@@ -1,11 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import {
-    CardTemplate,
-    useCardTemplateStore,
-    CardValue,
-} from '@/lib/stores/playground.store'
+import { useCardTemplateStore } from '@/lib/stores/playground.store'
 import { LucideIconName } from '@/lib/constants/lucide'
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer'
 import { Button } from '@/components/ui/button'
@@ -15,7 +11,6 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Plus, Trash2, Save, X } from 'lucide-react'
-import { LucideIconMap } from '@/lib/constants/lucide'
 import {
     Select,
     SelectContent,
@@ -26,6 +21,8 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area'
 import TemplateCard from './template-card'
 import IconGridPopup from './icon-grid-popup'
+import { CardTemplate, CardValue } from '@garder/shared'
+import { DialogTitle } from '@radix-ui/react-dialog'
 
 interface TemplateDrawerProps {
     children: React.ReactNode
@@ -58,6 +55,7 @@ const TemplateDrawer = ({ children }: TemplateDrawerProps) => {
                     icon: 'Thermometer',
                 },
             ],
+            labels: [],
         }
         setEditingTemplate(newTemplate)
         setIsCreating(true)
@@ -86,6 +84,13 @@ const TemplateDrawer = ({ children }: TemplateDrawerProps) => {
             setEditingTemplate(null)
             setIsCreating(false)
         }
+    }
+
+    const handleDuplicateTemplate = (template: CardTemplate) => {
+        addTemplate({
+            ...template,
+            id: `template-${Date.now()}`,
+        })
     }
 
     const handleAddValue = () => {
@@ -175,6 +180,7 @@ const TemplateDrawer = ({ children }: TemplateDrawerProps) => {
         >
             <DrawerTrigger asChild>{children}</DrawerTrigger>
             <DrawerContent className="w-[700px]!">
+                <DialogTitle></DialogTitle>
                 <div className="p-4 space-y-4 h-full flex flex-col">
                     {editingTemplate ? (
                         // Edit Template Form
@@ -325,6 +331,73 @@ const TemplateDrawer = ({ children }: TemplateDrawerProps) => {
                                     />
                                 </div>
 
+                                <div>
+                                    <Label>Labels</Label>
+                                    <div className="flex flex-wrap gap-2 mt-1">
+                                        {editingTemplate.labels?.map(
+                                            (label, idx) => (
+                                                <div
+                                                    key={idx}
+                                                    className="flex items-center bg-muted rounded px-2 py-1 text-xs"
+                                                >
+                                                    <Input
+                                                        value={label}
+                                                        onChange={(e) => {
+                                                            const newLabels = [
+                                                                ...editingTemplate.labels,
+                                                            ]
+                                                            newLabels[idx] =
+                                                                e.target.value
+                                                            setEditingTemplate({
+                                                                ...editingTemplate,
+                                                                labels: newLabels,
+                                                            })
+                                                        }}
+                                                        className="w-20 h-6 px-1 py-0 text-xs bg-transparent border-none focus:ring-0 focus:outline-none"
+                                                    />
+                                                    <Button
+                                                        size="icon"
+                                                        variant="ghost"
+                                                        className="ml-1 p-0 h-4 w-4"
+                                                        onClick={() => {
+                                                            const newLabels =
+                                                                editingTemplate.labels.filter(
+                                                                    (_, i) =>
+                                                                        i !==
+                                                                        idx,
+                                                                )
+                                                            setEditingTemplate({
+                                                                ...editingTemplate,
+                                                                labels: newLabels,
+                                                            })
+                                                        }}
+                                                        tabIndex={-1}
+                                                    >
+                                                        <X size={12} />
+                                                    </Button>
+                                                </div>
+                                            ),
+                                        )}
+                                        <Button
+                                            size="icon"
+                                            variant="outline"
+                                            className="h-6 w-6 p-0"
+                                            onClick={() => {
+                                                setEditingTemplate({
+                                                    ...editingTemplate,
+                                                    labels: [
+                                                        ...(editingTemplate.labels ||
+                                                            []),
+                                                        '',
+                                                    ],
+                                                })
+                                            }}
+                                        >
+                                            <Plus size={14} />
+                                        </Button>
+                                    </div>
+                                </div>
+
                                 <Separator />
 
                                 <div>
@@ -458,6 +531,9 @@ const TemplateDrawer = ({ children }: TemplateDrawerProps) => {
                                                         }
                                                         onDelete={
                                                             handleDeleteTemplate
+                                                        }
+                                                        onDuplicate={
+                                                            handleDuplicateTemplate
                                                         }
                                                     />
                                                 ),

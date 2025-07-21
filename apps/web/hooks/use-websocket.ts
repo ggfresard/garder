@@ -74,6 +74,7 @@ export const useWebSocket = (serverUrl?: string) => {
             unsubscribeConnection()
             unsubscribeState()
             unsubscribeElement()
+            unsubscribeRemoveElement()
             unsubscribeTemplate()
             unsubscribeError()
             disconnect()

@@ -1,5 +1,4 @@
 import React from 'react'
-import { CardTemplate } from '@/lib/stores/playground.store'
 import { LucideIconMap } from '@/lib/constants/lucide'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
@@ -15,17 +14,20 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { CardTemplate } from '@garder/shared'
 
 interface TemplateCardProps {
     template: CardTemplate
     onEdit: (template: CardTemplate) => void
     onDelete: (id: string) => void
+    onDuplicate: (template: CardTemplate) => void // Added prop
 }
 
 const TemplateCard: React.FC<TemplateCardProps> = ({
     template,
     onEdit,
     onDelete,
+    onDuplicate, // Added prop
 }) => {
     return (
         <ContextMenu>
@@ -63,10 +65,18 @@ const TemplateCard: React.FC<TemplateCardProps> = ({
                             <div className="truncate">{template.title}</div>
                         </div>
                     </div>
+                    <Separator className="mb-1 bg-white/20" />
+
+                    {template.labels && template.labels.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mb-1">
+                            {template.labels.map((label) => (
+                                <Badge key={label}>{label}</Badge>
+                            ))}
+                        </div>
+                    )}
                     <div className="flex-1 flex flex-col overflow-hidden">
                         {template.values && template.values.length > 0 && (
                             <>
-                                <Separator className="mb-3 bg-white/20" />
                                 <div className="space-y-2 flex-1 overflow-auto">
                                     {template.values.map((value, index) => {
                                         const ValueIconComponent = value.icon
@@ -117,6 +127,9 @@ const TemplateCard: React.FC<TemplateCardProps> = ({
             <ContextMenuContent>
                 <ContextMenuItem onClick={() => onEdit(template)}>
                     <Edit className="w-4 h-4 mr-2" /> Edit
+                </ContextMenuItem>
+                <ContextMenuItem onClick={() => onDuplicate(template)}>
+                    <Edit className="w-4 h-4 mr-2" /> Duplicate
                 </ContextMenuItem>
                 <ContextMenuItem
                     variant="destructive"

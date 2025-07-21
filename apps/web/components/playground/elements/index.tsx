@@ -1,4 +1,4 @@
-import { ElementType, PlaygroundElement } from '@/lib/stores/playground.store'
+import { ElementType, PlaygroundElement } from '@garder/shared'
 import CardElement from './card'
 import TextElement from './text'
 

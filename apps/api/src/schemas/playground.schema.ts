@@ -52,6 +52,9 @@ export class CardTemplate {
 
     @Prop()
     topRightLabel?: string
+
+    @Prop()
+    labels?: string[]
 }
 
 // Base Element Schema (abstract)

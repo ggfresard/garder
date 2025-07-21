@@ -2,9 +2,7 @@ import {
     CardElement as CardElementType,
     CardValue,
     ElementType,
-    usePlaygroundElementStore,
-    useCardTemplateStore,
-} from '@/lib/stores/playground.store'
+} from '@garder/shared'
 
 import { MinusIcon, PlusIcon, Sword } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -33,6 +31,10 @@ import { LucideIconMap } from '@/lib/constants/lucide'
 import { Badge } from '@/components/ui/badge'
 import { shuffleArray } from '@/lib/utils/shuffle.util'
 import { useShallow } from 'zustand/react/shallow'
+import {
+    useCardTemplateStore,
+    usePlaygroundElementStore,
+} from '@/lib/stores/playground.store'
 
 interface CardElementProps {
     element: CardElementType
@@ -162,12 +164,22 @@ const CardElement = ({ element }: CardElementProps) => {
                                         {template.topRightLabel}
                                     </Badge>
                                 )}
+                                <Separator className="mb-1 bg-white/20" />
+
+                                {template.labels &&
+                                    template.labels.length > 0 && (
+                                        <div className="flex flex-wrap gap-1 mb-1">
+                                            {template.labels.map((label) => (
+                                                <Badge key={label}>
+                                                    {label}
+                                                </Badge>
+                                            ))}
+                                        </div>
+                                    )}
 
                                 {template.values &&
                                     template.values.length > 0 && (
                                         <div className="flex flex-col flex-1 overflow-hidden">
-                                            <Separator className="mb-3 bg-white/20" />
-
                                             <div className="flex-1 space-y-2 overflow-auto">
                                                 {template.values.map(
                                                     (

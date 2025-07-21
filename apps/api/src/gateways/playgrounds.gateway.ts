@@ -9,8 +9,7 @@ import {
 import { Server, Socket } from 'socket.io'
 import { PlaygroundsService } from '../services/playgrounds.service'
 import { Logger } from '@nestjs/common'
-import { PlaygroundElement, SocketEvents } from '@garder/shared'
-import { CardTemplate } from 'src/schemas/playground.schema'
+import { CardTemplate, PlaygroundElement, SocketEvents } from '@garder/shared'
 
 @WebSocketGateway({
     cors: {
@@ -29,6 +28,7 @@ export class PlaygroundsGateway
 
     handleConnection(client: Socket) {
         this.logger.log(`Client connected: ${client.id}`)
+        this.logger.log(this.playgroundsService.getPlaygroundState().elements)
         client.emit(
             SocketEvents.PLAYGROUND_STATE,
             this.playgroundsService.getPlaygroundState(),

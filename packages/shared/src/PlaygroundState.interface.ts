@@ -44,6 +44,7 @@ export interface CardTemplate {
     color: string
     id: string
     topRightLabel?: string
+    labels: string[]
 }
 
 export interface CardValue {
