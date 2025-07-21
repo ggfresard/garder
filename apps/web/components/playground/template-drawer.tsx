@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/select'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import TemplateCard from './template-card'
+import IconGridPopup from './icon-grid-popup'
 
 interface TemplateDrawerProps {
     children: React.ReactNode
@@ -164,10 +165,6 @@ const TemplateDrawer = ({ children }: TemplateDrawerProps) => {
         { value: 'bg-indigo-500', label: 'Indigo' },
         { value: 'bg-gray-500', label: 'Gray' },
     ]
-
-    const iconOptions = Object.keys(LucideIconMap).filter(
-        (key) => key !== 'icons',
-    ) as LucideIconName[]
 
     return (
         <Drawer
@@ -391,7 +388,7 @@ const TemplateDrawer = ({ children }: TemplateDrawerProps) => {
                                                                 }
                                                                 className="w-20"
                                                             />
-                                                            <Select
+                                                            <IconGridPopup
                                                                 value={
                                                                     value.icon ||
                                                                     ''
@@ -405,36 +402,9 @@ const TemplateDrawer = ({ children }: TemplateDrawerProps) => {
                                                                         icon as LucideIconName,
                                                                     )
                                                                 }
-                                                            >
-                                                                <SelectTrigger className="w-32">
-                                                                    <SelectValue />
-                                                                </SelectTrigger>
-                                                                <SelectContent>
-                                                                    {iconOptions
-                                                                        .slice(
-                                                                            0,
-                                                                            20,
-                                                                        )
-                                                                        .map(
-                                                                            (
-                                                                                icon,
-                                                                            ) => (
-                                                                                <SelectItem
-                                                                                    key={
-                                                                                        icon
-                                                                                    }
-                                                                                    value={
-                                                                                        icon
-                                                                                    }
-                                                                                >
-                                                                                    {
-                                                                                        icon
-                                                                                    }
-                                                                                </SelectItem>
-                                                                            ),
-                                                                        )}
-                                                                </SelectContent>
-                                                            </Select>
+                                                                placeholder="Select icon"
+                                                                className="w-32"
+                                                            />
                                                             <Button
                                                                 size="sm"
                                                                 variant="outline"

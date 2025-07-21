@@ -153,199 +153,192 @@ const CardElement = ({ element }: CardElementProps) => {
                                               : '#60a5fa',
                                 }}
                             >
-                                <div className="flex-grow overflow-hidden">
-                                    <div className="text-sm font-medium mb-3">
-                                        {template.title}
-                                    </div>
+                                <div className="text-sm font-medium mb-3">
+                                    {template.title}
+                                </div>
 
-                                    {template.topRightLabel && isTopCard && (
-                                        <Badge className="absolute -top-2 -right-2">
-                                            {template.topRightLabel}
-                                        </Badge>
-                                    )}
+                                {template.topRightLabel && isTopCard && (
+                                    <Badge className="absolute -top-2 -right-2">
+                                        {template.topRightLabel}
+                                    </Badge>
+                                )}
 
-                                    {/* Display card values with icons and tooltips */}
-                                    {template.values &&
-                                        template.values.length > 0 && (
-                                            <>
-                                                <Separator className="mb-3 bg-white/20" />
+                                {template.values &&
+                                    template.values.length > 0 && (
+                                        <div className="flex flex-col flex-1 overflow-hidden">
+                                            <Separator className="mb-3 bg-white/20" />
 
-                                                <div className="space-y-2">
-                                                    {template.values.map(
-                                                        (
-                                                            value: CardValue,
-                                                            index: number,
-                                                        ) => {
-                                                            const IconComponent =
-                                                                value.icon
-                                                                    ? LucideIconMap[
-                                                                          value.icon as keyof typeof LucideIconMap
-                                                                      ]
-                                                                    : null
+                                            <div className="flex-1 space-y-2 overflow-auto">
+                                                {template.values.map(
+                                                    (
+                                                        value: CardValue,
+                                                        index: number,
+                                                    ) => {
+                                                        const IconComponent =
+                                                            value.icon
+                                                                ? LucideIconMap[
+                                                                      value.icon as keyof typeof LucideIconMap
+                                                                  ]
+                                                                : null
 
-                                                            // Find corresponding modifier for this value
-                                                            const modifier =
-                                                                element
-                                                                    .modifiers?.[
-                                                                    index
-                                                                ]
-                                                            const finalValue =
-                                                                modifier
-                                                                    ? value.value +
-                                                                      modifier.value
-                                                                    : value.value
-                                                            const isPositive =
-                                                                finalValue >=
-                                                                value.value
-                                                            const hasModifier =
-                                                                modifier &&
-                                                                modifier.value !==
-                                                                    0
+                                                        // Find corresponding modifier for this value
+                                                        const modifier =
+                                                            element.modifiers?.[
+                                                                index
+                                                            ]
+                                                        const finalValue =
+                                                            modifier
+                                                                ? value.value +
+                                                                  modifier.value
+                                                                : value.value
+                                                        const isPositive =
+                                                            finalValue >=
+                                                            value.value
+                                                        const hasModifier =
+                                                            modifier &&
+                                                            modifier.value !== 0
 
-                                                            const handleModifierChange =
-                                                                (
-                                                                    newValue: number,
-                                                                ) => {
-                                                                    const currentModifiers =
-                                                                        element.modifiers ||
-                                                                        []
-                                                                    const newModifiers =
-                                                                        [
-                                                                            ...currentModifiers,
-                                                                        ]
+                                                        const handleModifierChange =
+                                                            (
+                                                                newValue: number,
+                                                            ) => {
+                                                                const currentModifiers =
+                                                                    element.modifiers ||
+                                                                    []
+                                                                const newModifiers =
+                                                                    [
+                                                                        ...currentModifiers,
+                                                                    ]
 
-                                                                    // Create modifier if it doesn't exist
-                                                                    if (
-                                                                        !modifier
-                                                                    ) {
-                                                                        newModifiers[
-                                                                            index
-                                                                        ] = {
-                                                                            label: `Modifier for ${
-                                                                                value.label ||
-                                                                                'Value'
-                                                                            }`,
-                                                                            value: newValue,
-                                                                        }
-                                                                    } else {
-                                                                        newModifiers[
-                                                                            index
-                                                                        ] = {
-                                                                            ...modifier,
-                                                                            value: newValue,
-                                                                        }
+                                                                // Create modifier if it doesn't exist
+                                                                if (!modifier) {
+                                                                    newModifiers[
+                                                                        index
+                                                                    ] = {
+                                                                        label: `Modifier for ${
+                                                                            value.label ||
+                                                                            'Value'
+                                                                        }`,
+                                                                        value: newValue,
                                                                     }
-
-                                                                    updateElement(
-                                                                        element.id,
-                                                                        {
-                                                                            ...element,
-                                                                            modifiers:
-                                                                                newModifiers,
-                                                                        },
-                                                                    )
+                                                                } else {
+                                                                    newModifiers[
+                                                                        index
+                                                                    ] = {
+                                                                        ...modifier,
+                                                                        value: newValue,
+                                                                    }
                                                                 }
 
-                                                            return (
-                                                                <Popover
-                                                                    key={index}
+                                                                updateElement(
+                                                                    element.id,
+                                                                    {
+                                                                        ...element,
+                                                                        modifiers:
+                                                                            newModifiers,
+                                                                    },
+                                                                )
+                                                            }
+
+                                                        return (
+                                                            <Popover
+                                                                key={index}
+                                                            >
+                                                                <PopoverTrigger
+                                                                    asChild
                                                                 >
-                                                                    <PopoverTrigger
-                                                                        asChild
-                                                                    >
-                                                                        <div className="flex items-center gap-2 text-xs cursor-pointer hover:bg-white/10 p-1 rounded transition-colors">
-                                                                            {IconComponent && (
-                                                                                <IconComponent className="w-3 h-3 flex-shrink-0" />
-                                                                            )}
-                                                                            <span className="font-medium">
-                                                                                {
-                                                                                    value.value
-                                                                                }
-                                                                            </span>
-                                                                            {hasModifier && (
-                                                                                <>
-                                                                                    <span className="text-white/70">
-                                                                                        {modifier.value >=
-                                                                                        0
-                                                                                            ? '+'
-                                                                                            : ''}
-                                                                                        {
-                                                                                            modifier.value
-                                                                                        }
-                                                                                    </span>
-                                                                                    <span className="text-white/70">
-                                                                                        =
-                                                                                    </span>
-                                                                                    <span
-                                                                                        className={`font-bold ${
-                                                                                            isPositive
-                                                                                                ? 'text-green-300'
-                                                                                                : 'text-red-300'
-                                                                                        }`}
-                                                                                    >
-                                                                                        {
-                                                                                            finalValue
-                                                                                        }
-                                                                                    </span>
-                                                                                </>
-                                                                            )}
-                                                                        </div>
-                                                                    </PopoverTrigger>
-                                                                    <PopoverContent
-                                                                        className="w-auto p-2"
-                                                                        side="bottom"
-                                                                    >
-                                                                        <div className="flex items-center gap-2">
-                                                                            <Button
-                                                                                size="sm"
-                                                                                variant="outline"
-                                                                                onClick={() =>
-                                                                                    handleModifierChange(
-                                                                                        (modifier?.value ||
-                                                                                            0) -
-                                                                                            1,
-                                                                                    )
-                                                                                }
-                                                                                className="w-8 h-8 p-0"
-                                                                            >
-                                                                                <MinusIcon className="w-3 h-3" />
-                                                                            </Button>
-                                                                            <span className="min-w-[3rem] text-center text-sm font-mono">
-                                                                                {modifier?.value ||
-                                                                                    0}
-                                                                            </span>
-                                                                            <Button
-                                                                                size="sm"
-                                                                                variant="outline"
-                                                                                onClick={() =>
-                                                                                    handleModifierChange(
-                                                                                        (modifier?.value ||
-                                                                                            0) +
-                                                                                            1,
-                                                                                    )
-                                                                                }
-                                                                                className="w-8 h-8 p-0"
-                                                                            >
-                                                                                <PlusIcon className="w-3 h-3" />
-                                                                            </Button>
-                                                                        </div>
-                                                                    </PopoverContent>
-                                                                </Popover>
-                                                            )
-                                                        },
-                                                    )}
-                                                </div>
-                                            </>
-                                        )}
-                                </div>
+                                                                    <div className="flex items-center gap-2 text-xs cursor-pointer hover:bg-white/10 p-1 rounded transition-colors">
+                                                                        {IconComponent && (
+                                                                            <IconComponent className="w-3 h-3 flex-shrink-0" />
+                                                                        )}
+                                                                        <span className="font-medium">
+                                                                            {
+                                                                                value.value
+                                                                            }
+                                                                        </span>
+                                                                        {hasModifier && (
+                                                                            <>
+                                                                                <span className="text-white/70">
+                                                                                    {modifier.value >=
+                                                                                    0
+                                                                                        ? '+'
+                                                                                        : ''}
+                                                                                    {
+                                                                                        modifier.value
+                                                                                    }
+                                                                                </span>
+                                                                                <span className="text-white/70">
+                                                                                    =
+                                                                                </span>
+                                                                                <span
+                                                                                    className={`font-bold ${
+                                                                                        isPositive
+                                                                                            ? 'text-green-300'
+                                                                                            : 'text-red-300'
+                                                                                    }`}
+                                                                                >
+                                                                                    {
+                                                                                        finalValue
+                                                                                    }
+                                                                                </span>
+                                                                            </>
+                                                                        )}
+                                                                    </div>
+                                                                </PopoverTrigger>
+                                                                <PopoverContent
+                                                                    className="w-auto p-2"
+                                                                    side="bottom"
+                                                                >
+                                                                    <div className="flex items-center gap-2">
+                                                                        <Button
+                                                                            size="sm"
+                                                                            variant="outline"
+                                                                            onClick={() =>
+                                                                                handleModifierChange(
+                                                                                    (modifier?.value ||
+                                                                                        0) -
+                                                                                        1,
+                                                                                )
+                                                                            }
+                                                                            className="w-8 h-8 p-0"
+                                                                        >
+                                                                            <MinusIcon className="w-3 h-3" />
+                                                                        </Button>
+                                                                        <span className="min-w-[3rem] text-center text-sm font-mono">
+                                                                            {modifier?.value ||
+                                                                                0}
+                                                                        </span>
+                                                                        <Button
+                                                                            size="sm"
+                                                                            variant="outline"
+                                                                            onClick={() =>
+                                                                                handleModifierChange(
+                                                                                    (modifier?.value ||
+                                                                                        0) +
+                                                                                        1,
+                                                                                )
+                                                                            }
+                                                                            className="w-8 h-8 p-0"
+                                                                        >
+                                                                            <PlusIcon className="w-3 h-3" />
+                                                                        </Button>
+                                                                    </div>
+                                                                </PopoverContent>
+                                                            </Popover>
+                                                        )
+                                                    },
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
 
                                 {/* Display card description with tooltip */}
                                 {template.description && (
-                                    <div className="flex-shrink-0 pb-1">
+                                    <div className="pb-1">
                                         <Separator className="mb-2 bg-white/20" />
                                         <Tooltip>
                                             <TooltipTrigger asChild>
-                                                <p className="text-xs text-white/70 truncate">
+                                                <p className="text-xs text-white/70 truncate text-center">
                                                     {template.description}
                                                 </p>
                                             </TooltipTrigger>

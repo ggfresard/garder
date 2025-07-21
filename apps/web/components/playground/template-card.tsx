@@ -10,6 +10,11 @@ import {
     ContextMenuItem,
 } from '@/components/ui/context-menu'
 import { Edit, Trash2 } from 'lucide-react'
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from '@/components/ui/tooltip'
 
 interface TemplateCardProps {
     template: CardTemplate
@@ -26,7 +31,7 @@ const TemplateCard: React.FC<TemplateCardProps> = ({
         <ContextMenu>
             <ContextMenuTrigger asChild>
                 <div
-                    className={`${template.color} relative text-white p-4 rounded-lg cursor-pointer select-none shadow-lg border-1 border-opacity-60 hover:shadow-xl transition-all duration-200 group`}
+                    className={`${template.color} flex flex-col relative text-white p-4 rounded-lg cursor-pointer select-none shadow-lg border-1 border-opacity-60 hover:shadow-xl transition-all duration-200 group`}
                     onClick={() => onEdit(template)}
                     style={{
                         borderColor: template.color.includes('blue')
@@ -58,13 +63,12 @@ const TemplateCard: React.FC<TemplateCardProps> = ({
                             <div className="truncate">{template.title}</div>
                         </div>
                     </div>
-                    {template.values && template.values.length > 0 && (
-                        <>
-                            <Separator className="mb-3 bg-white/20" />
-                            <div className="space-y-2">
-                                {template.values
-                                    .slice(0, 3)
-                                    .map((value, index) => {
+                    <div className="flex-1 flex flex-col overflow-hidden">
+                        {template.values && template.values.length > 0 && (
+                            <>
+                                <Separator className="mb-3 bg-white/20" />
+                                <div className="space-y-2 flex-1 overflow-auto">
+                                    {template.values.map((value, index) => {
                                         const ValueIconComponent = value.icon
                                             ? LucideIconMap[
                                                   value.icon as keyof typeof LucideIconMap
@@ -89,14 +93,24 @@ const TemplateCard: React.FC<TemplateCardProps> = ({
                                             </div>
                                         )
                                     })}
-                                {template.values.length > 3 && (
-                                    <div className="text-xs text-white/70 pt-1 border-t border-white/20">
-                                        +{template.values.length - 3} more
-                                        values
-                                    </div>
-                                )}
-                            </div>
-                        </>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                    {template.description && (
+                        <div className="flex-shrink-0 pb-1">
+                            <Separator className="mb-2 bg-white/20" />
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <p className="text-xs text-white/70 truncate text-center">
+                                        {template.description}
+                                    </p>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>{template.description}</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </div>
                     )}
                 </div>
             </ContextMenuTrigger>
